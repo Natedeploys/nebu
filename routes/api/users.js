@@ -61,5 +61,40 @@ router.post('/register', (req, res) => {
     })
 });
 
+// @route:       POST api/users/register
+// @description: Login User / Return Token
+// @access:      Public
+router.post('/login', (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // Find the user by email
+  User.findOne({
+      email: email
+    })
+    .then(user => {
+      // Check for user
+      if (!user) {
+        // Return not found status and json error 
+        return res.status(404).json({
+          email: "User not found"
+        });
+      }
+
+      // Check and compare password
+      bcrypt.compare(password, user.password)
+        .then(isMatch => {
+          if (isMatch) {
+            res.json({
+              msg: "success"
+            })
+          } else {
+            return res.status(400).json({
+              password: "Password incorrect"
+            })
+          }
+        })
+    });
+});
 
 module.exports = router;
