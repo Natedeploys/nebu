@@ -6,6 +6,10 @@ const jwt = require('jsonwebtoken');
 const keys = require('../../config/keys');
 const passport = require('passport');
 
+// Load input validation
+const validateRegisterInput = require('../../validation/register');
+
+
 // Load our user model
 const User = require('../../models/User');
 
@@ -22,6 +26,18 @@ router.get('/test', (req, res) => {
 // @description: Register user
 // @access:      Public
 router.post('/register', (req, res) => {
+
+  // from the function grab errors and isValid
+  const {
+    errors,
+    isValid
+  } = validateRegisterInput(req.body);
+
+  // if isValid is false, then an error must have occured
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+
   // Check with Mongoose within MongoDB
   // If the email already exists
   User.findOne({
@@ -29,9 +45,8 @@ router.post('/register', (req, res) => {
     })
     .then(user => {
       if (user) {
-        return res.status(400).json({
-          email: "Email already exist"
-        });
+        errors.email = "Email already exist";
+        return res.status(400).json(errors);
       } else {
         // Grab the gravatar of the user
         const avatar = gravatar.url(req.body.email, {
