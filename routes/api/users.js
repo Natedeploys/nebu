@@ -13,14 +13,29 @@ const validateLoginInput = require('../../validation/login');
 // Load our user model
 const User = require('../../models/User');
 
-// @route:       GET api/users/test
-// @description: Tests users route
+/*
+// @route:       GET api/users/current
+// @description: Current users route
 // @access:      Public
-router.get('/test', (req, res) => {
-  res.json({
-    msg: "users works"
-  });
+router.get('/current', passport.authenticate('jwt', {
+  session: false
+}), (req, res) => {
+
+  const errors = {}
+
+  Profile.findOne({
+      user: req.user.id
+    })
+    .then(profile => {
+      if (!profile) {
+        errors.noprofile = "There is no profile for this user";
+        return res.status(404).json(errors);
+      }
+      res.json(profile);
+    }).catch(err => res.status(400).json(err));
+
 });
+*/
 
 // @route:       POST api/users/register
 // @description: Register user
